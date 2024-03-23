@@ -10,6 +10,9 @@ import {
   Star,
   User,
   ChevronRight,
+  Gauge,
+  Settings,
+  NotebookText,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -24,47 +27,24 @@ export interface SidebarMenuProps {
 
 const sidebarMenu: SidebarMenuProps[] = [
   {
-    title: "Manage User",
-    icon: User,
+    title: "ศูนย์ควบคุม",
+    icon: Gauge,
     path: "/manage-user",
   },
   {
-    title: "Manage Attraction",
-    icon: MapPin,
+    title: "รายงานแสดงผล",
+    icon: NotebookText,
     path: "/manage-attraction",
   },
   {
-    title: "Manage Trip",
-    icon: Plane,
+    title: "ตั้งค่า",
+    icon: Settings,
     path: "/manage-trip",
   },
   {
-    title: "Manage Local Trip",
-    icon: Bus,
+    title: "จัดการผู้ใช้",
+    icon: User,
     path: "/manage-local-trip",
-  },
-  {
-    title: "Manage Review",
-    icon: Star,
-    chevron: ChevronRight,
-    path: "/manage-review",
-    subMenu: [
-      {
-        title: "Attraction Review",
-        icon: FerrisWheel,
-        path: "/manage-review/attraction",
-      },
-      {
-        title: "Trip Review",
-        icon: Map,
-        path: "/manage-review/trip",
-      },
-      {
-        title: "Local Trip Review",
-        icon: Map,
-        path: "/manage-review/local-trip",
-      },
-    ],
   },
 ];
 

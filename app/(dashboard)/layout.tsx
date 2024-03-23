@@ -14,6 +14,10 @@ export default function DashboardLayout({
         <Topbar />
         <div className="mt-[68px] p-6">
           <div className=" bg-white w-full px-4 rounded-sm">{children}</div>
+          {/* <div className="flex gap-2 items-center w-full justify-end mt-4">
+            Power by
+            <img src="/i_power_logo.png" alt="logo" width={100} className="" />
+          </div> */}
         </div>
       </div>
     </div>

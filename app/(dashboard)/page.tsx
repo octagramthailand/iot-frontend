@@ -49,66 +49,80 @@ export default function DashboardPage() {
     // Handle messages from the "sendToReact" topic and update state
     socket.on("sendToReact", (message: ISocketMessage) => {
       console.log('Received message from topic "sendToReact":', message);
-      if (message.type === "voltageDC") {
-        seVoltageDC({
-          value: message.value,
-          time: message.time,
-        });
-      } else if (message.type === "voltageL1") {
-        seVoltageL1({
-          value: message.value,
-          time: message.time,
-        });
-      } else if (message.type === "voltageL2") {
-        seVoltageL2({
-          value: message.value,
-          time: message.time,
-        });
-      } else if (message.type === "voltageL3") {
-        seVoltageL3({
-          value: message.value,
-          time: message.time,
-        });
-      } else if (message.type === "currentDC") {
-        seCurrentDC({
-          value: message.value,
-          time: message.time,
-        });
-      } else if (message.type === "currentL1") {
-        seCurrentL1({
-          value: message.value,
-          time: message.time,
-        });
-      } else if (message.type === "currentL2") {
-        seCurrentL2({
-          value: message.value,
-          time: message.time,
-        });
-      } else if (message.type === "currentL3") {
-        seCurrentL3({
-          value: message.value,
-          time: message.time,
-        });
-      } else if (message.type === "tempInverter") {
-        seTempInverter({
-          value: message.value,
-          time: message.time,
-        });
-      } else if (message.type === "tempLogger") {
-        seTempLogger({
-          value: message.value,
-          time: message.time,
-        });
-      } else if (message.type === "powerInverter") {
-        sePowerInverter({
-          value: message.value,
-          time: message.time,
-        });
-      }
+      setValue(message);
     });
   }, []);
 
-  const handleRefresh = () => {};
+  const setValue = (message: ISocketMessage) => {
+    if (message.type === "voltageDC") {
+      seVoltageDC({
+        value: message.value / 10,
+        time: message.time,
+      });
+    } else if (message.type === "voltageL1") {
+      seVoltageL1({
+        value: message.value / 10,
+        time: message.time,
+      });
+    } else if (message.type === "voltageL2") {
+      seVoltageL2({
+        value: message.value / 10,
+        time: message.time,
+      });
+    } else if (message.type === "voltageL3") {
+      seVoltageL3({
+        value: message.value / 10,
+        time: message.time,
+      });
+    } else if (message.type === "currentDC") {
+      seCurrentDC({
+        value: message.value / 10,
+        time: message.time,
+      });
+    } else if (message.type === "currentL1") {
+      seCurrentL1({
+        value: message.value / 10,
+        time: message.time,
+      });
+    } else if (message.type === "currentL2") {
+      seCurrentL2({
+        value: message.value / 10,
+        time: message.time,
+      });
+    } else if (message.type === "currentL3") {
+      seCurrentL3({
+        value: message.value / 10,
+        time: message.time,
+      });
+    } else if (message.type === "tempInverter") {
+      seTempInverter({
+        value: message.value / 10,
+        time: message.time,
+      });
+    } else if (message.type === "tempLogger") {
+      seTempLogger({
+        value: message.value / 10,
+        time: message.time,
+      });
+    } else if (message.type === "powerInverter") {
+      sePowerInverter({
+        value: message.value / 10,
+        time: message.time,
+      });
+    }
+  };
+
+  const handleRefresh = async (type: string) => {
+    try {
+      // Make a GET request to the server
+      const response = await fetch(`http://localhost:4000/modbus?type=${type}`);
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+    } catch (error) {
+      console.error("Failed to fetch data:", error);
+    }
+  };
 
   return (
     <div className="w-full">
@@ -119,6 +133,7 @@ export default function DashboardPage() {
             type="voltageDC"
             label="แรงดันภาคกระแสตรง"
             units="โวลต์"
+            max={400}
             data={voltageDC}
           />
         </div>
