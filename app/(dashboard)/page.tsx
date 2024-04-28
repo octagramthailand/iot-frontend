@@ -56,57 +56,57 @@ export default function DashboardPage() {
   const setValue = (message: ISocketMessage) => {
     if (message.type === "voltageDC") {
       seVoltageDC({
-        value: message.value / 10,
+        value: message.value,
         time: message.time,
       });
     } else if (message.type === "voltageL1") {
       seVoltageL1({
-        value: message.value / 10,
+        value: message.value,
         time: message.time,
       });
     } else if (message.type === "voltageL2") {
       seVoltageL2({
-        value: message.value / 10,
+        value: message.value,
         time: message.time,
       });
     } else if (message.type === "voltageL3") {
       seVoltageL3({
-        value: message.value / 10,
+        value: message.value,
         time: message.time,
       });
     } else if (message.type === "currentDC") {
       seCurrentDC({
-        value: message.value / 10,
+        value: message.value,
         time: message.time,
       });
     } else if (message.type === "currentL1") {
       seCurrentL1({
-        value: message.value / 10,
+        value: message.value,
         time: message.time,
       });
     } else if (message.type === "currentL2") {
       seCurrentL2({
-        value: message.value / 10,
+        value: message.value,
         time: message.time,
       });
     } else if (message.type === "currentL3") {
       seCurrentL3({
-        value: message.value / 10,
+        value: message.value,
         time: message.time,
       });
     } else if (message.type === "tempInverter") {
       seTempInverter({
-        value: message.value / 10,
+        value: message.value,
         time: message.time,
       });
     } else if (message.type === "tempLogger") {
       seTempLogger({
-        value: message.value / 10,
+        value: message.value,
         time: message.time,
       });
     } else if (message.type === "powerInverter") {
       sePowerInverter({
-        value: message.value / 10,
+        value: message.value,
         time: message.time,
       });
     }
@@ -176,6 +176,7 @@ export default function DashboardPage() {
             label="กระแส DC"
             units="แอมแปร์"
             data={currentDC}
+            max={25}
           />
         </div>
         <div className="flex justify-center border-r border-gray-200">
@@ -185,6 +186,7 @@ export default function DashboardPage() {
             label="กระแส L1"
             units="แอมแปร์"
             data={currentL1}
+            max={25}
           />
         </div>
         <div className="flex justify-center border-r border-gray-200">
@@ -194,6 +196,7 @@ export default function DashboardPage() {
             label="กระแส L2"
             units="แอมแปร์"
             data={currentL2}
+            max={25}
           />
         </div>
         <div className="flex justify-center">
@@ -203,6 +206,7 @@ export default function DashboardPage() {
             label="กระแส L3"
             units="แอมแปร์"
             data={currentL3}
+            max={25}
           />
         </div>
 
