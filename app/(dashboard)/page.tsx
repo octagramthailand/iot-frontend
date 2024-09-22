@@ -2,7 +2,7 @@
 
 import { Gauge } from "@/components/widgets/gauge";
 import { gaugeData } from "@/constant";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 
 // const socket = io("http://localhost:4000");
@@ -38,6 +38,64 @@ export default function DashboardPage() {
   const [powerInverter, sePowerInverter] =
     useState<IGaugeValue>(initGagueValue);
 
+  // Refs to store the latest state values
+  const voltageDCRef = useRef(voltageDC);
+  const voltageL1Ref = useRef(voltageL1);
+  const voltageL2Ref = useRef(voltageL2);
+  const voltageL3Ref = useRef(voltageL3);
+  const currentDCRef = useRef(currentDC);
+  const currentL1Ref = useRef(currentL1);
+  const currentL2Ref = useRef(currentL2);
+  const currentL3Ref = useRef(currentL3);
+  const tempInverterRef = useRef(tempInverter);
+  const tempLoggerRef = useRef(tempLogger);
+  const powerInverterRef = useRef(powerInverter);
+
+  // Sync refs with the latest state values
+  useEffect(() => {
+    voltageDCRef.current = voltageDC;
+  }, [voltageDC]);
+
+  useEffect(() => {
+    voltageL1Ref.current = voltageL1;
+  }, [voltageL1]);
+
+  useEffect(() => {
+    voltageL2Ref.current = voltageL2;
+  }, [voltageL2]);
+
+  useEffect(() => {
+    voltageL3Ref.current = voltageL3;
+  }, [voltageL3]);
+
+  useEffect(() => {
+    currentDCRef.current = currentDC;
+  }, [currentDC]);
+
+  useEffect(() => {
+    currentL1Ref.current = currentL1;
+  }, [currentL1]);
+
+  useEffect(() => {
+    currentL2Ref.current = currentL2;
+  }, [currentL2]);
+
+  useEffect(() => {
+    currentL3Ref.current = currentL3;
+  }, [currentL3]);
+
+  useEffect(() => {
+    tempInverterRef.current = tempInverter;
+  }, [tempInverter]);
+
+  useEffect(() => {
+    tempLoggerRef.current = tempLogger;
+  }, [tempLogger]);
+
+  useEffect(() => {
+    powerInverterRef.current = powerInverter;
+  }, [powerInverter]);
+
   // useEffect(() => {
   //   // Listen for connection success
   //   socket.on("connect", () => {
@@ -56,6 +114,8 @@ export default function DashboardPage() {
 
   const setValue = (message: ISocketMessage) => {
     if (message.type === "voltageDC") {
+      console.log("come here - --------");
+      console.log("message.value: ", message.value);
       seVoltageDC({
         value: message.value,
         time: message.time,
@@ -113,61 +173,72 @@ export default function DashboardPage() {
     }
   };
 
+  useEffect(() => {
+    console.log("voltageDC_state", voltageDC);
+  }, [voltageDC]);
+
   function getRandomData(min: number, max: number): number {
     const randomValue = Math.random() * (max - min) + min;
     return parseFloat(randomValue.toFixed(2));
   }
 
   const handleRefresh = async (type: string) => {
-    try {
-      // Fire and forget the fetch request, not awaiting or using the response
-      fetch(`http://localhost:4000/modbus?type=${type}`).catch(() => {});
-    } catch (error) {
-      // Silently handle any errors, ignoring them completely
-    }
+    // try {
+    //   // Fire and forget the fetch request, not awaiting or using the response
+    //   fetch(`http://localhost:4000/modbus?type=${type}`).catch(() => {});
+    // } catch (error) {
+    //   // Silently handle any errors, ignoring them completely
+    // }
     console.log("type: ", type);
 
     let existingValue;
-
+    console.log("existingValue: ", existingValue);
+    console.log("come here - 44");
     // Get existing value from the state based on the type
     if (type === "voltageDC") {
-      existingValue = voltageDC.value;
+      existingValue = voltageDCRef.current.value;
     } else if (type === "voltageL1") {
-      existingValue = voltageL1.value;
+      existingValue = voltageL1Ref.current.value;
     } else if (type === "voltageL2") {
-      existingValue = voltageL2.value;
+      existingValue = voltageL2Ref.current.value;
     } else if (type === "voltageL3") {
-      existingValue = voltageL3.value;
+      existingValue = voltageL3Ref.current.value;
     } else if (type === "currentDC") {
-      existingValue = currentDC.value;
+      existingValue = currentDCRef.current.value;
     } else if (type === "currentL1") {
-      existingValue = currentL1.value;
+      existingValue = currentL1Ref.current.value;
     } else if (type === "currentL2") {
-      existingValue = currentL2.value;
+      existingValue = currentL2Ref.current.value;
     } else if (type === "currentL3") {
-      existingValue = currentL3.value;
+      existingValue = currentL3Ref.current.value;
     } else if (type === "tempInverter") {
-      existingValue = tempInverter.value;
+      existingValue = tempInverterRef.current.value;
     } else if (type === "tempLogger") {
-      existingValue = tempLogger.value;
+      existingValue = tempLoggerRef.current.value;
     } else if (type === "powerInverter") {
-      existingValue = powerInverter.value;
+      existingValue = powerInverterRef.current.value;
     }
-
+    console.log("existingValue: ", existingValue);
     let randomData;
-
+    console.log("come here - 000");
     if (existingValue !== undefined && existingValue !== 0) {
+      console.log("existingValue: ", existingValue);
+      console.log("come here - 999");
       // Calculate 5% allowable difference
       const minValue = existingValue * 0.95;
       const maxValue = existingValue * 1.05;
-
+      console.log("come here - 001");
+      console.log("minValue: ", minValue);
       // Ensure the new value is within the original gaugeData bounds
       const constrainedMin = Math.max(gaugeData[type].min, minValue);
       const constrainedMax = Math.min(gaugeData[type].max, maxValue);
+      console.log("constrainedMin: ", constrainedMin);
+      console.log("constrainedMax: ", constrainedMax);
 
       // Generate random value within the 5% range
       randomData = getRandomData(constrainedMin, constrainedMax);
     } else {
+      console.log("come here - 666");
       // Generate a completely random value within the original range
       randomData = getRandomData(gaugeData[type].min, gaugeData[type].max);
     }
@@ -180,6 +251,24 @@ export default function DashboardPage() {
       time: Date.now(),
     });
   };
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      handleRefresh("voltageDC");
+      handleRefresh("voltageL1");
+      handleRefresh("voltageL2");
+      handleRefresh("voltageL3");
+      handleRefresh("currentDC");
+      handleRefresh("currentL1");
+      handleRefresh("currentL2");
+      handleRefresh("currentL3");
+      handleRefresh("tempInverter");
+      handleRefresh("tempLogger");
+      handleRefresh("powerInverter");
+    }, 2000); // 1 second interval
+
+    return () => clearInterval(intervalId); // Cleanup interval on unmount
+  }, []);
 
   return (
     <div className="w-full">
@@ -201,6 +290,7 @@ export default function DashboardPage() {
             label="แรงดัน L1"
             units="โวลต์"
             data={voltageL1}
+            max={300}
           />
         </div>
         <div className="flex justify-center border-r border-gray-200">
@@ -210,6 +300,7 @@ export default function DashboardPage() {
             label="แรงดัน L2"
             units="โวลต์"
             data={voltageL2}
+            max={300}
           />
         </div>
         <div className="flex justify-center">
@@ -219,6 +310,7 @@ export default function DashboardPage() {
             label="แรงดัน L3"
             units="โวลต์"
             data={voltageL3}
+            max={300}
           />
         </div>
 
@@ -296,6 +388,7 @@ export default function DashboardPage() {
             label="ค่าผลิตพลังงาน Inverter"
             units="วัตต์"
             data={powerInverter}
+            max={2000}
           />
         </div>
         {/* <div className="flex justify-center">
