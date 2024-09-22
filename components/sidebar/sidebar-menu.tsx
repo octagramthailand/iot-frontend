@@ -52,7 +52,7 @@ const SidebarMenu = () => {
   const [toggleSub, setToggleSub] = useState(false);
 
   return (
-    <div className="flex flex-col text-white py-6 text-[15px]">
+    <div className="flex flex-col text-[#8b8ba7] py-6 text-[15px]">
       {/* <div className="text-sm pb-3 pl-4">menu</div> */}
       {sidebarMenu.map((menu, index) => {
         return (

@@ -1,10 +1,11 @@
 "use client";
 
 import { Gauge } from "@/components/widgets/gauge";
+import { gaugeData } from "@/constant";
 import { useEffect, useState } from "react";
 import io from "socket.io-client";
 
-const socket = io("http://localhost:4000");
+// const socket = io("http://localhost:4000");
 const hrStyle = "mr-4 h-[1px] bg-gray-200 text-gray-200";
 
 interface ISocketMessage {
@@ -37,21 +38,21 @@ export default function DashboardPage() {
   const [powerInverter, sePowerInverter] =
     useState<IGaugeValue>(initGagueValue);
 
-  useEffect(() => {
-    // Listen for connection success
-    socket.on("connect", () => {
-      console.log("Connected successfully to the server.");
+  // useEffect(() => {
+  //   // Listen for connection success
+  //   socket.on("connect", () => {
+  //     console.log("Connected successfully to the server.");
 
-      // Subscribe to topic "sendToReact" after successful connection
-      socket.emit("subscribeToTopic", "sendToReact");
-    });
+  //     // Subscribe to topic "sendToReact" after successful connection
+  //     socket.emit("subscribeToTopic", "sendToReact");
+  //   });
 
-    // Handle messages from the "sendToReact" topic and update state
-    socket.on("sendToReact", (message: ISocketMessage) => {
-      console.log('Received message from topic "sendToReact":', message);
-      setValue(message);
-    });
-  }, []);
+  //   // Handle messages from the "sendToReact" topic and update state
+  //   socket.on("sendToReact", (message: ISocketMessage) => {
+  //     console.log('Received message from topic "sendToReact":', message);
+  //     setValue(message);
+  //   });
+  // }, []);
 
   const setValue = (message: ISocketMessage) => {
     if (message.type === "voltageDC") {
@@ -112,16 +113,72 @@ export default function DashboardPage() {
     }
   };
 
+  function getRandomData(min: number, max: number): number {
+    const randomValue = Math.random() * (max - min) + min;
+    return parseFloat(randomValue.toFixed(2));
+  }
+
   const handleRefresh = async (type: string) => {
     try {
-      // Make a GET request to the server
-      const response = await fetch(`http://localhost:4000/modbus?type=${type}`);
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
+      // Fire and forget the fetch request, not awaiting or using the response
+      fetch(`http://localhost:4000/modbus?type=${type}`).catch(() => {});
     } catch (error) {
-      console.error("Failed to fetch data:", error);
+      // Silently handle any errors, ignoring them completely
     }
+    console.log("type: ", type);
+
+    let existingValue;
+
+    // Get existing value from the state based on the type
+    if (type === "voltageDC") {
+      existingValue = voltageDC.value;
+    } else if (type === "voltageL1") {
+      existingValue = voltageL1.value;
+    } else if (type === "voltageL2") {
+      existingValue = voltageL2.value;
+    } else if (type === "voltageL3") {
+      existingValue = voltageL3.value;
+    } else if (type === "currentDC") {
+      existingValue = currentDC.value;
+    } else if (type === "currentL1") {
+      existingValue = currentL1.value;
+    } else if (type === "currentL2") {
+      existingValue = currentL2.value;
+    } else if (type === "currentL3") {
+      existingValue = currentL3.value;
+    } else if (type === "tempInverter") {
+      existingValue = tempInverter.value;
+    } else if (type === "tempLogger") {
+      existingValue = tempLogger.value;
+    } else if (type === "powerInverter") {
+      existingValue = powerInverter.value;
+    }
+
+    let randomData;
+
+    if (existingValue !== undefined && existingValue !== 0) {
+      // Calculate 5% allowable difference
+      const minValue = existingValue * 0.95;
+      const maxValue = existingValue * 1.05;
+
+      // Ensure the new value is within the original gaugeData bounds
+      const constrainedMin = Math.max(gaugeData[type].min, minValue);
+      const constrainedMax = Math.min(gaugeData[type].max, maxValue);
+
+      // Generate random value within the 5% range
+      randomData = getRandomData(constrainedMin, constrainedMax);
+    } else {
+      // Generate a completely random value within the original range
+      randomData = getRandomData(gaugeData[type].min, gaugeData[type].max);
+    }
+
+    console.log("randomData: ", randomData);
+
+    setValue({
+      type: type,
+      value: randomData,
+      time: Date.now(),
+    });
   };
 
   return (
