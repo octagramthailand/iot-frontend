@@ -34,7 +34,6 @@ export default function DashboardPage() {
   const [currentL2, seCurrentL2] = useState<IGaugeValue>(initGagueValue);
   const [currentL3, seCurrentL3] = useState<IGaugeValue>(initGagueValue);
   const [tempInverter, seTempInverter] = useState<IGaugeValue>(initGagueValue);
-  const [tempLogger, seTempLogger] = useState<IGaugeValue>(initGagueValue);
   const [powerInverter, sePowerInverter] =
     useState<IGaugeValue>(initGagueValue);
 
@@ -48,7 +47,6 @@ export default function DashboardPage() {
   const currentL2Ref = useRef(currentL2);
   const currentL3Ref = useRef(currentL3);
   const tempInverterRef = useRef(tempInverter);
-  const tempLoggerRef = useRef(tempLogger);
   const powerInverterRef = useRef(powerInverter);
 
   // Sync refs with the latest state values
@@ -87,10 +85,6 @@ export default function DashboardPage() {
   useEffect(() => {
     tempInverterRef.current = tempInverter;
   }, [tempInverter]);
-
-  useEffect(() => {
-    tempLoggerRef.current = tempLogger;
-  }, [tempLogger]);
 
   useEffect(() => {
     powerInverterRef.current = powerInverter;
@@ -160,11 +154,6 @@ export default function DashboardPage() {
         value: message.value,
         time: message.time,
       });
-    } else if (message.type === "tempLogger") {
-      seTempLogger({
-        value: message.value,
-        time: message.time,
-      });
     } else if (message.type === "powerInverter") {
       sePowerInverter({
         value: message.value,
@@ -172,10 +161,6 @@ export default function DashboardPage() {
       });
     }
   };
-
-  useEffect(() => {
-    console.log("voltageDC_state", voltageDC);
-  }, [voltageDC]);
 
   function getRandomData(min: number, max: number): number {
     const randomValue = Math.random() * (max - min) + min;
@@ -213,8 +198,6 @@ export default function DashboardPage() {
       existingValue = currentL3Ref.current.value;
     } else if (type === "tempInverter") {
       existingValue = tempInverterRef.current.value;
-    } else if (type === "tempLogger") {
-      existingValue = tempLoggerRef.current.value;
     } else if (type === "powerInverter") {
       existingValue = powerInverterRef.current.value;
     }
@@ -225,8 +208,8 @@ export default function DashboardPage() {
       console.log("existingValue: ", existingValue);
       console.log("come here - 999");
       // Calculate 5% allowable difference
-      const minValue = existingValue * 0.95;
-      const maxValue = existingValue * 1.05;
+      const minValue = existingValue * 0.98;
+      const maxValue = existingValue * 1.02;
       console.log("come here - 001");
       console.log("minValue: ", minValue);
       // Ensure the new value is within the original gaugeData bounds
@@ -263,7 +246,6 @@ export default function DashboardPage() {
       handleRefresh("currentL2");
       handleRefresh("currentL3");
       handleRefresh("tempInverter");
-      handleRefresh("tempLogger");
       handleRefresh("powerInverter");
     }, 2000); // 1 second interval
 
@@ -325,7 +307,7 @@ export default function DashboardPage() {
             label="กระแส DC"
             units="แอมแปร์"
             data={currentDC}
-            max={25}
+            max={15}
           />
         </div>
         <div className="flex justify-center border-r border-gray-200">
@@ -375,20 +357,11 @@ export default function DashboardPage() {
         <div className="flex justify-center border-r border-gray-200">
           <Gauge
             handleRefresh={handleRefresh}
-            type="tempLogger"
-            label="อุณหภูมิเครื่อง Data logger"
-            units="องศาเซลเซียส"
-            data={tempLogger}
-          />
-        </div>
-        <div className="flex justify-center border-r border-gray-200">
-          <Gauge
-            handleRefresh={handleRefresh}
             type="powerInverter"
             label="ค่าผลิตพลังงาน Inverter"
             units="วัตต์"
             data={powerInverter}
-            max={2000}
+            max={4000}
           />
         </div>
         {/* <div className="flex justify-center">
